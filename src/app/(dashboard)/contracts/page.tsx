@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,38 +32,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ContractResponse } from '@/types/api';
+import { useToast } from '@/hooks/use-toast';
+import { useContracts } from '@/hooks/use-contracts';
 
-// Mock data - will be replaced with real API calls
-const mockContracts = [
-  {
-    id: '1',
-    title: 'Software License Agreement',
-    contract_number: 'SLA-2024-001',
-    status: 'draft',
-    value: 50000,
-    currency: 'USD',
-    effective_date: '2024-01-15',
-    expiration_date: '2025-01-15',
-    created_at: '2024-01-01',
-  },
-  {
-    id: '2',
-    title: 'Service Contract',
-    contract_number: 'SC-2024-002',
-    status: 'in_review',
-    value: 25000,
-    currency: 'USD',
-    effective_date: '2024-02-01',
-    expiration_date: '2024-12-31',
-    created_at: '2024-01-10',
-  },
-];
 
 const statusColors = {
   draft: 'bg-gray-100 text-gray-800',
   in_review: 'bg-yellow-100 text-yellow-800',
   approved: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
+  negotiated: 'bg-purple-100 text-purple-800',
   executed: 'bg-blue-100 text-blue-800',
   expired: 'bg-red-100 text-red-800',
 };
@@ -73,6 +52,7 @@ const statusLabels = {
   in_review: 'In Review',
   approved: 'Approved',
   rejected: 'Rejected',
+  negotiated: 'Negotiated',
   executed: 'Executed',
   expired: 'Expired',
 };
@@ -80,8 +60,30 @@ const statusLabels = {
 export default function ContractsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { toast } = useToast();
+  
+  // Use React Query to fetch contracts
+  const { 
+    data: contracts = [], 
+    isLoading, 
+    error, 
+    refetch: fetchContracts 
+  } = useContracts({
+    status: statusFilter !== 'all' ? statusFilter as any : undefined,
+  });
 
-  const filteredContracts = mockContracts.filter((contract) => {
+  // Show error toast when there's an error
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'Error loading contracts',
+        description: (error as any)?.detail || 'Failed to load contracts',
+        variant: 'destructive',
+      });
+    }
+  }, [error, toast]);
+
+  const filteredContracts = contracts.filter((contract) => {
     const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contract.contract_number.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
@@ -95,7 +97,8 @@ export default function ContractsPage() {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'Not set';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -147,6 +150,7 @@ export default function ContractsPage() {
                 <SelectItem value="in_review">In Review</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="negotiated">Negotiated</SelectItem>
                 <SelectItem value="executed">Executed</SelectItem>
                 <SelectItem value="expired">Expired</SelectItem>
               </SelectContent>
@@ -155,8 +159,33 @@ export default function ContractsPage() {
         </CardContent>
       </Card>
 
-      {/* Contracts List */}
-      {filteredContracts.length === 0 ? (
+      {/* Loading State */}
+      {isLoading ? (
+        <Card>
+          <CardContent className="py-12">
+            <div className="text-center space-y-4">
+              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+              <p className="text-muted-foreground">Loading contracts...</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : error ? (
+        <Card>
+          <CardContent className="py-12">
+            <div className="text-center space-y-4">
+              <FileText className="mx-auto h-12 w-12 text-red-500" />
+              <div>
+                <h3 className="text-lg font-medium text-red-600">Error loading contracts</h3>
+                <p className="text-muted-foreground">{(error as any)?.detail || 'Failed to load contracts'}</p>
+              </div>
+              <Button onClick={() => fetchContracts()} variant="outline">
+                Try Again
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : /* Contracts List */
+      filteredContracts.length === 0 ? (
         <Card>
           <CardContent className="py-12">
             <div className="text-center space-y-4">
@@ -202,10 +231,12 @@ export default function ContractsPage() {
                         <FileText className="h-4 w-4" />
                         <span>{contract.contract_number}</span>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <DollarSign className="h-4 w-4" />
-                        <span>{formatCurrency(contract.value, contract.currency)}</span>
-                      </div>
+                      {contract.value && (
+                        <div className="flex items-center space-x-1">
+                          <DollarSign className="h-4 w-4" />
+                          <span>{formatCurrency(contract.value, contract.currency)}</span>
+                        </div>
+                      )}
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
                         <span>{formatDate(contract.effective_date)} - {formatDate(contract.expiration_date)}</span>

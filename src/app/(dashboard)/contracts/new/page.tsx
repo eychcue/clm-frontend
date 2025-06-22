@@ -28,6 +28,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { ContractCreate } from '@/types/api';
+import { useCreateContract } from '@/hooks/use-contracts';
 
 const contractSchema = z.object({
   title: z.string().min(1, 'Contract title is required'),
@@ -54,9 +56,9 @@ const contractTypes = [
 ];
 
 export default function NewContractPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const createContractMutation = useCreateContract();
 
   const form = useForm<ContractFormData>({
     resolver: zodResolver(contractSchema),
@@ -73,24 +75,23 @@ export default function NewContractPage() {
   });
 
   const onSubmit = async (data: ContractFormData) => {
-    setIsSubmitting(true);
     try {
       // Prepare the data for API
-      const contractData = {
-        ...data,
-        value: data.value ? parseFloat(data.value) : undefined,
+      const contractData: ContractCreate = {
+        title: data.title,
+        contract_number: data.contract_number,
+        contract_type: data.contract_type || undefined,
         effective_date: data.effective_date || undefined,
         expiration_date: data.expiration_date || undefined,
+        value: data.value ? parseFloat(data.value) : undefined,
+        currency: data.currency,
         metadata: {
           description: data.description,
         },
       };
 
-      // TODO: Replace with actual API call
-      console.log('Creating contract:', contractData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Use React Query mutation
+      await createContractMutation.mutateAsync(contractData);
 
       toast({
         title: 'Contract created successfully',
@@ -104,8 +105,6 @@ export default function NewContractPage() {
         description: error?.detail || 'Something went wrong',
         variant: 'destructive',
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -308,8 +307,8 @@ export default function NewContractPage() {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? (
+                  <Button type="submit" disabled={createContractMutation.isPending}>
+                    {createContractMutation.isPending ? (
                       <>
                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
                         Creating...
