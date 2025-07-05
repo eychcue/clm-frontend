@@ -97,7 +97,7 @@ export interface OrganizationStats {
   pending_approvals: number;
 }
 
-// Contract types
+// Contract types (legacy - kept for backward compatibility)
 export interface ContractBase {
   title: string;
   contract_number: string;
@@ -135,6 +135,45 @@ export interface ContractWithWorkflows extends ContractResponse {
 }
 
 export type ContractStatus = 'draft' | 'in_review' | 'approved' | 'rejected' | 'negotiated' | 'executed' | 'expired';
+
+// Agreement types (new terminology)
+export interface AgreementBase {
+  title: string;
+  agreement_number: string;
+  agreement_type?: string;
+  effective_date?: string;
+  expiration_date?: string;
+  value?: number;
+  currency: string;
+  metadata?: Record<string, any>;
+}
+
+export interface AgreementCreate extends AgreementBase {}
+
+export interface AgreementUpdate {
+  title?: string;
+  status?: AgreementStatus;
+  effective_date?: string;
+  expiration_date?: string;
+  value?: number;
+  metadata?: Record<string, any>;
+}
+
+export interface AgreementResponse extends AgreementBase {
+  id: string;
+  organization_id: string;
+  status: AgreementStatus;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgreementWithWorkflows extends AgreementResponse {
+  workflows?: any[];
+  approval_status?: any;
+}
+
+export type AgreementStatus = 'draft' | 'in_review' | 'approved' | 'rejected' | 'negotiated' | 'executed' | 'expired';
 
 // Document types
 export interface DocumentUpload {
@@ -342,6 +381,13 @@ export interface PaginationParams {
 
 export interface ContractFilters extends PaginationParams {
   status?: ContractStatus;
+  search?: string;
+  start_date?: string;
+  end_date?: string;
+}
+
+export interface AgreementFilters extends PaginationParams {
+  status?: AgreementStatus;
   search?: string;
   start_date?: string;
   end_date?: string;

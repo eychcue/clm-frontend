@@ -54,8 +54,8 @@ const navigation = [
     icon: LayoutDashboard,
   },
   {
-    name: 'Contracts',
-    href: '/contracts',
+    name: 'Agreements',
+    href: '/agreements',
     icon: FileText,
     badge: 'New',
   },
@@ -129,16 +129,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
               <div>
                 <h1 className="text-lg font-semibold">CLM</h1>
-                <p className="text-xs text-muted-foreground">Contract Manager</p>
+                <p className="text-xs text-muted-foreground">Agreement Manager</p>
               </div>
             </div>
           </SidebarHeader>
 
           <SidebarContent className="px-4 py-4">
             <div className="mb-4">
-              <Button className="w-full justify-start" size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                New Contract
+              <Button className="w-full justify-start" size="sm" asChild>
+                <Link href="/agreements/new">
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Agreement
+                </Link>
               </Button>
             </div>
 
@@ -216,7 +218,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <Search className="h-4 w-4 text-muted-foreground" />
                   <input
                     type="text"
-                    placeholder="Search contracts, negotiations..."
+                    placeholder="Search agreements, negotiations..."
                     className="border-0 bg-transparent text-sm focus:outline-none focus:ring-0 w-64"
                   />
                 </div>
