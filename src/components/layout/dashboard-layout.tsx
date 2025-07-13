@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useSignOut } from '@/hooks/use-auth';
+import { useInvitations } from '@/hooks/use-users';
 import {
   LayoutDashboard,
   FileText,
@@ -91,6 +92,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { toast } = useToast();
   const signOutMutation = useSignOut();
   const router = useRouter();
+  
+  // Get pending invitations for notification badge
+  const { data: invitations = [] } = useInvitations({ 
+    received_by_me: true,
+    status: 'pending' 
+  });
+  const pendingInvitations = invitations.filter(inv => inv.status === 'pending');
 
   const handleSignOut = async () => {
     try {
@@ -154,6 +162,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       {item.badge && (
                         <Badge variant="secondary" className="ml-auto text-xs">
                           {item.badge}
+                        </Badge>
+                      )}
+                      {item.name === 'Team' && pendingInvitations.length > 0 && (
+                        <Badge variant="destructive" className="ml-auto text-xs">
+                          {pendingInvitations.length}
                         </Badge>
                       )}
                     </Link>
@@ -225,8 +238,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
 
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
-                  <Bell className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="relative" asChild>
+                  <Link href="/team">
+                    <Bell className="h-4 w-4" />
+                    {pendingInvitations.length > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center"
+                      >
+                        {pendingInvitations.length}
+                      </Badge>
+                    )}
+                  </Link>
                 </Button>
               </div>
             </div>

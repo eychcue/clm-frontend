@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import InvitationBanner from '@/components/notifications/invitation-banner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/auth-context';
@@ -100,6 +101,9 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Invitation Banner */}
+      <InvitationBanner />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

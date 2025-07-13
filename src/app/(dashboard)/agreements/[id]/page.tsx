@@ -29,6 +29,7 @@ import DocumentUpload from '@/components/documents/document-upload';
 import DocumentList from '@/components/documents/document-list';
 import CreateNegotiationDialog from '@/components/negotiations/create-negotiation-dialog';
 import NegotiationList from '@/components/negotiations/negotiation-list';
+import InviteUserDialog from '@/components/users/invite-user-dialog';
 
 const statusColors = {
   draft: 'bg-gray-100 text-gray-800',
@@ -408,10 +409,12 @@ export default function AgreementDetailPage() {
                 <Upload className="h-4 w-4 mr-2" />
                 Upload Document
               </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                Share Agreement
-              </Button>
+              <InviteUserDialog agreementId={agreementId}>
+                <Button variant="outline" className="w-full justify-start">
+                  <Users className="h-4 w-4 mr-2" />
+                  Share Agreement
+                </Button>
+              </InviteUserDialog>
             </CardContent>
           </Card>
 
