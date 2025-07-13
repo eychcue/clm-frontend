@@ -26,14 +26,14 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      title: 'Total Contracts',
+      title: 'Total Agreements',
       value: '0',
-      description: 'All contracts in system',
+      description: 'All agreements in system',
       icon: FileText,
       color: 'text-blue-600',
     },
     {
-      title: 'Active Contracts',
+      title: 'Active Agreements',
       value: '0',
       description: 'Currently active',
       icon: CheckCircle,
@@ -69,16 +69,16 @@ export default function DashboardPage() {
 
   const quickActions = [
     {
-      title: 'Create Contract',
-      description: 'Start a new contract',
-      href: '/contracts/new',
+      title: 'Create Agreement',
+      description: 'Start a new agreement',
+      href: '/agreements/new',
       icon: Plus,
       color: 'bg-blue-600',
     },
     {
-      title: 'View Contracts',
-      description: 'Browse all contracts',
-      href: '/contracts',
+      title: 'View Agreements',
+      description: 'Browse all agreements',
+      href: '/agreements',
       icon: Eye,
       color: 'bg-purple-600',
     },
@@ -107,13 +107,13 @@ export default function DashboardPage() {
             Welcome back, {user?.full_name}!
           </h1>
           <p className="text-muted-foreground">
-            Here's what's happening with your contracts today.
+            Here's what's happening with your agreements today.
           </p>
         </div>
         <Button asChild>
-          <Link href="/contracts/new">
+          <Link href="/agreements/new">
             <Plus className="mr-2 h-4 w-4" />
-            New Contract
+            New Agreement
           </Link>
         </Button>
       </div>
@@ -252,13 +252,13 @@ export default function DashboardPage() {
               <span className="text-gray-600 text-sm font-medium">3</span>
             </div>
             <div className="flex-1">
-              <p className="font-medium">Create your first contract</p>
+              <p className="font-medium">Create your first agreement</p>
               <p className="text-sm text-muted-foreground">
-                Start managing your contracts with CLM
+                Start managing your agreements with CLM
               </p>
             </div>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/contracts/new">Create</Link>
+              <Link href="/agreements/new">Create</Link>
             </Button>
           </div>
         </CardContent>

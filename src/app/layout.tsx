@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CLM - Contract Lifecycle Management",
-  description: "Comprehensive contract lifecycle management system with advanced negotiation features",
+  title: "CLM - Agreement Lifecycle Management",
+  description: "Comprehensive agreement lifecycle management system with advanced negotiation features",
 };
 
 export default function RootLayout({

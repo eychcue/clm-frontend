@@ -32,9 +32,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ContractResponse } from '@/types/api';
+import { AgreementResponse } from '@/types/api';
 import { useToast } from '@/hooks/use-toast';
-import { useContracts } from '@/hooks/use-contracts';
+import { useAgreements } from '@/hooks/use-agreements';
 
 
 const statusColors = {
@@ -57,18 +57,18 @@ const statusLabels = {
   expired: 'Expired',
 };
 
-export default function ContractsPage() {
+export default function AgreementsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
   
-  // Use React Query to fetch contracts
+  // Use React Query to fetch agreements
   const { 
-    data: contracts = [], 
+    data: agreements = [], 
     isLoading, 
     error, 
-    refetch: fetchContracts 
-  } = useContracts({
+    refetch: fetchAgreements 
+  } = useAgreements({
     status: statusFilter !== 'all' ? statusFilter as any : undefined,
   });
 
@@ -76,17 +76,17 @@ export default function ContractsPage() {
   useEffect(() => {
     if (error) {
       toast({
-        title: 'Error loading contracts',
-        description: (error as any)?.detail || 'Failed to load contracts',
+        title: 'Error loading agreements',
+        description: (error as any)?.detail || 'Failed to load agreements',
         variant: 'destructive',
       });
     }
   }, [error, toast]);
 
-  const filteredContracts = contracts.filter((contract) => {
-    const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.contract_number.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
+  const filteredAgreements = agreements.filter((agreement) => {
+    const matchesSearch = agreement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agreement.agreement_number.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || agreement.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -111,15 +111,15 @@ export default function ContractsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Contracts</h1>
+          <h1 className="text-2xl font-bold">Agreements</h1>
           <p className="text-muted-foreground">
-            Manage and track all your contracts
+            Manage and track all your agreements
           </p>
         </div>
         <Button asChild>
-          <Link href="/contracts/new">
+          <Link href="/agreements/new">
             <Plus className="mr-2 h-4 w-4" />
-            New Contract
+            New Agreement
           </Link>
         </Button>
       </div>
@@ -132,7 +132,7 @@ export default function ContractsPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search contracts..."
+                  placeholder="Search agreements..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -165,7 +165,7 @@ export default function ContractsPage() {
           <CardContent className="py-12">
             <div className="text-center space-y-4">
               <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
-              <p className="text-muted-foreground">Loading contracts...</p>
+              <p className="text-muted-foreground">Loading agreements...</p>
             </div>
           </CardContent>
         </Card>
@@ -175,34 +175,34 @@ export default function ContractsPage() {
             <div className="text-center space-y-4">
               <FileText className="mx-auto h-12 w-12 text-red-500" />
               <div>
-                <h3 className="text-lg font-medium text-red-600">Error loading contracts</h3>
-                <p className="text-muted-foreground">{(error as any)?.detail || 'Failed to load contracts'}</p>
+                <h3 className="text-lg font-medium text-red-600">Error loading agreements</h3>
+                <p className="text-muted-foreground">{(error as any)?.detail || 'Failed to load agreements'}</p>
               </div>
-              <Button onClick={() => fetchContracts()} variant="outline">
+              <Button onClick={() => fetchAgreements()} variant="outline">
                 Try Again
               </Button>
             </div>
           </CardContent>
         </Card>
-      ) : /* Contracts List */
-      filteredContracts.length === 0 ? (
+      ) : /* Agreements List */
+      filteredAgreements.length === 0 ? (
         <Card>
           <CardContent className="py-12">
             <div className="text-center space-y-4">
               <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
               <div>
-                <h3 className="text-lg font-medium">No contracts found</h3>
+                <h3 className="text-lg font-medium">No agreements found</h3>
                 <p className="text-muted-foreground">
                   {searchTerm || statusFilter !== 'all'
                     ? 'Try adjusting your search or filters'
-                    : 'Get started by creating your first contract'}
+                    : 'Get started by creating your first agreement'}
                 </p>
               </div>
               {!searchTerm && statusFilter === 'all' && (
                 <Button asChild>
-                  <Link href="/contracts/new">
+                  <Link href="/agreements/new">
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Contract
+                    Create Agreement
                   </Link>
                 </Button>
               )}
@@ -211,40 +211,40 @@ export default function ContractsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredContracts.map((contract) => (
-            <Card key={contract.id} className="hover:shadow-md transition-shadow">
+          {filteredAgreements.map((agreement) => (
+            <Card key={agreement.id} className="hover:shadow-md transition-shadow">
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center space-x-3">
-                      <h3 className="font-semibold text-lg">{contract.title}</h3>
+                      <h3 className="font-semibold text-lg">{agreement.title}</h3>
                       <Badge
-                        className={statusColors[contract.status as keyof typeof statusColors]}
+                        className={statusColors[agreement.status as keyof typeof statusColors]}
                         variant="secondary"
                       >
-                        {statusLabels[contract.status as keyof typeof statusLabels]}
+                        {statusLabels[agreement.status as keyof typeof statusLabels]}
                       </Badge>
                     </div>
                     
                     <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                       <div className="flex items-center space-x-1">
                         <FileText className="h-4 w-4" />
-                        <span>{contract.contract_number}</span>
+                        <span>{agreement.agreement_number}</span>
                       </div>
-                      {contract.value && (
+                      {agreement.value && (
                         <div className="flex items-center space-x-1">
                           <DollarSign className="h-4 w-4" />
-                          <span>{formatCurrency(contract.value, contract.currency)}</span>
+                          <span>{formatCurrency(agreement.value, agreement.currency)}</span>
                         </div>
                       )}
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
-                        <span>{formatDate(contract.effective_date)} - {formatDate(contract.expiration_date)}</span>
+                        <span>{formatDate(agreement.effective_date)} - {formatDate(agreement.expiration_date)}</span>
                       </div>
                     </div>
 
                     <p className="text-sm text-muted-foreground">
-                      Created on {formatDate(contract.created_at)}
+                      Created on {formatDate(agreement.created_at)}
                     </p>
                   </div>
 
@@ -256,21 +256,21 @@ export default function ContractsPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
-                        <Link href={`/contracts/${contract.id}`}>
+                        <Link href={`/agreements/${agreement.id}`}>
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href={`/contracts/${contract.id}/edit`}>
+                        <Link href={`/agreements/${agreement.id}/edit`}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Edit Contract
+                          Edit Agreement
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600">
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete Contract
+                        Delete Agreement
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

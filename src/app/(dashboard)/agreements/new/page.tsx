@@ -28,13 +28,13 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { ContractCreate } from '@/types/api';
-import { useCreateContract } from '@/hooks/use-contracts';
+import { AgreementCreate } from '@/types/api';
+import { useCreateAgreement } from '@/hooks/use-agreements';
 
-const contractSchema = z.object({
-  title: z.string().min(1, 'Contract title is required'),
-  contract_number: z.string().min(1, 'Contract number is required'),
-  contract_type: z.string().optional(),
+const agreementSchema = z.object({
+  title: z.string().min(1, 'Agreement title is required'),
+  agreement_number: z.string().min(1, 'Agreement number is required'),
+  agreement_type: z.string().optional(),
   effective_date: z.string().optional(),
   expiration_date: z.string().optional(),
   value: z.string().optional(),
@@ -42,9 +42,9 @@ const contractSchema = z.object({
   description: z.string().optional(),
 });
 
-type ContractFormData = z.infer<typeof contractSchema>;
+type AgreementFormData = z.infer<typeof agreementSchema>;
 
-const contractTypes = [
+const agreementTypes = [
   'Service Agreement',
   'Software License',
   'Non-Disclosure Agreement',
@@ -55,17 +55,17 @@ const contractTypes = [
   'Other',
 ];
 
-export default function NewContractPage() {
+export default function NewAgreementPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const createContractMutation = useCreateContract();
+  const createAgreementMutation = useCreateAgreement();
 
-  const form = useForm<ContractFormData>({
-    resolver: zodResolver(contractSchema),
+  const form = useForm<AgreementFormData>({
+    resolver: zodResolver(agreementSchema),
     defaultValues: {
       title: '',
-      contract_number: '',
-      contract_type: '',
+      agreement_number: '',
+      agreement_type: '',
       effective_date: '',
       expiration_date: '',
       value: '',
@@ -74,13 +74,13 @@ export default function NewContractPage() {
     },
   });
 
-  const onSubmit = async (data: ContractFormData) => {
+  const onSubmit = async (data: AgreementFormData) => {
     try {
       // Prepare the data for API
-      const contractData: ContractCreate = {
+      const agreementData: AgreementCreate = {
         title: data.title,
-        contract_number: data.contract_number,
-        contract_type: data.contract_type || undefined,
+        agreement_number: data.agreement_number,
+        agreement_type: data.agreement_type || undefined,
         effective_date: data.effective_date || undefined,
         expiration_date: data.expiration_date || undefined,
         value: data.value ? parseFloat(data.value) : undefined,
@@ -91,17 +91,17 @@ export default function NewContractPage() {
       };
 
       // Use React Query mutation
-      await createContractMutation.mutateAsync(contractData);
+      await createAgreementMutation.mutateAsync(agreementData);
 
       toast({
-        title: 'Contract created successfully',
-        description: `Contract "${data.title}" has been created.`,
+        title: 'Agreement created successfully',
+        description: `Agreement "${data.title}" has been created.`,
       });
 
-      router.push('/contracts');
+      router.push('/agreements');
     } catch (error: any) {
       toast({
-        title: 'Failed to create contract',
+        title: 'Failed to create agreement',
         description: error?.detail || 'Something went wrong',
         variant: 'destructive',
       });
@@ -113,15 +113,15 @@ export default function NewContractPage() {
       {/* Header */}
       <div className="flex items-center space-x-4">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/contracts">
+          <Link href="/agreements">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Contracts
+            Back to Agreements
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Create New Contract</h1>
+          <h1 className="text-2xl font-bold">Create New Agreement</h1>
           <p className="text-muted-foreground">
-            Enter the details for your new contract
+            Enter the details for your new agreement
           </p>
         </div>
       </div>
@@ -131,10 +131,10 @@ export default function NewContractPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <FileText className="h-5 w-5" />
-              <span>Contract Information</span>
+              <span>Agreement Information</span>
             </CardTitle>
             <CardDescription>
-              Fill in the basic information for your contract
+              Fill in the basic information for your agreement
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -146,7 +146,7 @@ export default function NewContractPage() {
                     name="title"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
-                        <FormLabel>Contract Title *</FormLabel>
+                        <FormLabel>Agreement Title *</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -160,10 +160,10 @@ export default function NewContractPage() {
 
                   <FormField
                     control={form.control}
-                    name="contract_number"
+                    name="agreement_number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Contract Number *</FormLabel>
+                        <FormLabel>Agreement Number *</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -171,7 +171,7 @@ export default function NewContractPage() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Unique identifier for this contract
+                          Unique identifier for this agreement
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -180,18 +180,18 @@ export default function NewContractPage() {
 
                   <FormField
                     control={form.control}
-                    name="contract_type"
+                    name="agreement_type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Contract Type</FormLabel>
+                        <FormLabel>Agreement Type</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select contract type" />
+                              <SelectValue placeholder="Select agreement type" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {contractTypes.map((type) => (
+                            {agreementTypes.map((type) => (
                               <SelectItem key={type} value={type}>
                                 {type}
                               </SelectItem>
@@ -238,7 +238,7 @@ export default function NewContractPage() {
                     name="value"
                     render={({ field }) => (
                       <FormItem className="col-span-2">
-                        <FormLabel>Contract Value</FormLabel>
+                        <FormLabel>Agreement Value</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -287,12 +287,12 @@ export default function NewContractPage() {
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder="Brief description of the contract purpose and scope..."
+                          placeholder="Brief description of the agreement purpose and scope..."
                           className="min-h-[100px]"
                         />
                       </FormControl>
                       <FormDescription>
-                        Optional description to help identify this contract
+                        Optional description to help identify this agreement
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -307,8 +307,8 @@ export default function NewContractPage() {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={createContractMutation.isPending}>
-                    {createContractMutation.isPending ? (
+                  <Button type="submit" disabled={createAgreementMutation.isPending}>
+                    {createAgreementMutation.isPending ? (
                       <>
                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
                         Creating...
@@ -316,7 +316,7 @@ export default function NewContractPage() {
                     ) : (
                       <>
                         <Save className="mr-2 h-4 w-4" />
-                        Create Contract
+                        Create Agreement
                       </>
                     )}
                   </Button>
